@@ -11,24 +11,16 @@ int main(int argc, char** argv)
 	// initialization
 	float vertices[] =
 	{
-		-0.5f, -0.5f, 0.0f,
-		 0.0f,  0.5f, 0.0f, 
-		 0.5f, -0.5f, 0.0f
+		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // point1
+		 0.0f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // point2
+		 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // point3
 	};
 
-	const char* vertexShaderSource = "#version 430 core\n"
-		"layout (location = 0) in vec3 vs_position;\n"
-		"void main()\n"
-		"{\n"
-		"   gl_Position = vec4(vs_position.x, vs_position.y, vs_position.z, 1.0);\n"
-		"}\0";
+	std::string vertexShaderSource;
+	nc::ReadFileToString("shaders\\basic.vert", vertexShaderSource);
 
-	const char* fragmentShaderSource = "#version 430 core\n"
-		"out vec4 out_color;\n"
-		"void main()\n"
-		"{\n"
-		"   out_color = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
-		"}\0";
+	std::string fragmentShaderSource;
+	nc::ReadFileToString("shaders\\basic.frag", fragmentShaderSource);
 
 	// create vertex buffers
 	GLuint vbo;
@@ -36,17 +28,24 @@ int main(int argc, char** argv)
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	// set position pipeline (vertex attribute)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
+
+	// set color pipeline (vertex attribute)
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	// create vertex shader
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
+	const char* str = vertexShaderSource.c_str();
+	glShaderSource(vertexShader, 1, &str, nullptr);
 	glCompileShader(vertexShader);
 
 	// create fragment shader
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
+	str = fragmentShaderSource.c_str();
+	glShaderSource(fragmentShader, 1, &str, nullptr);
 	glCompileShader(fragmentShader);
 
 	// create program

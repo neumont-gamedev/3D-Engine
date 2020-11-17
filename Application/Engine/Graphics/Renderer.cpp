@@ -50,6 +50,8 @@ namespace nc
 			exit(-1);
 		}
 
+		glViewport(0, 0, width, height);
+
 		return true;
 	}
 	void Renderer::BeginFrame()
