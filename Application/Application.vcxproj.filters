@@ -34,6 +34,9 @@
     <Filter Include="Source\Engine\Math">
       <UniqueIdentifier>{6b5716ff-bc24-4bff-bec8-9bbf5de086f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources\Textures">
+      <UniqueIdentifier>{24b73571-cfa3-49d7-8ea6-2e95f15d2939}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">

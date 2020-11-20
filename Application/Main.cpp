@@ -1,7 +1,7 @@
 #include "pch.h"
-#include <glad\glad.h>
 #include "Engine\Graphics\Renderer.h"
 #include "Engine\Graphics\Program.h"
+#include "Engine\Graphics\Texture.h"
 
 int main(int argc, char** argv)
 {
@@ -12,9 +12,9 @@ int main(int argc, char** argv)
 	// initialization
 	float vertices[] =
 	{
-		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // point1
-		 0.0f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // point2
-		 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // point3
+		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // point1
+		 0.0f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.0f, // point2
+		 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f  // point3
 	};
 
 	nc::Program program;
@@ -30,12 +30,25 @@ int main(int argc, char** argv)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	// set position pipeline (vertex attribute)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
 
 	// set color pipeline (vertex attribute)
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+
+	// set uv pipeline (vertex attribute)
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+	// uniform
+	glm::mat4 transform = glm::mat4(1.0f);
+	//GLuint uniform = glGetUniformLocation(program.GetProgramID(), "transform");
+	//glUniformMatrix4fv(uniform, 1, GL_FALSE, glm::value_ptr(transform));
+	program.SetUniform("transform", transform);
+
+	nc::Texture texture;
+	texture.CreateTexture("textures\\llama.jpg");
 
 	bool quit = false;
 	while (!quit)
@@ -56,6 +69,11 @@ int main(int argc, char** argv)
 		}
 
 		SDL_PumpEvents();
+
+		transform = glm::rotate(transform, 0.04f, glm::vec3(0, 0, 1));
+		program.SetUniform("transform", transform);
+
+		//glUniformMatrix4fv(uniform, 1, GL_FALSE, glm::value_ptr(transform));
 
 		renderer.BeginFrame();
 
