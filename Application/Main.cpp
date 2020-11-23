@@ -1,13 +1,10 @@
 #include "pch.h"
-#include "Engine\Graphics\Renderer.h"
-#include "Engine\Graphics\Program.h"
-#include "Engine\Graphics\Texture.h"
+#include "Engine/Engine.h"
 
 int main(int argc, char** argv)
 {
-	nc::Renderer renderer;
-	renderer.Startup();
-	renderer.Create("OpenGL", 800, 600);
+	nc::Engine engine;
+	engine.Startup();
 
 	// initialization
 	//float vertices[] =
@@ -82,11 +79,12 @@ int main(int argc, char** argv)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// uniform
-	glm::mat4 transform = glm::mat4(1.0f);
-	program.SetUniform("transform", transform);
+	glm::mat4 model = glm::mat4(1.0f);
 
 	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800 / 600.0f, 0.01f, 1000.0f);
-	glm::mat4 view = glm::lookAt(glm::vec3(0, 2, -5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	
+	glm::vec3 eye{0, 0, 5};
+	glm::mat4 view = glm::lookAt(eye, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 	nc::Texture texture;
 	texture.CreateTexture("textures\\llama.jpg");
@@ -110,21 +108,52 @@ int main(int argc, char** argv)
 		}
 
 		SDL_PumpEvents();
+		engine.Update();
 
-		transform = glm::rotate(transform, 0.04f, glm::vec3(0, 1, 0));
+		float angle = 0;
+		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_E) == nc::InputSystem::eButtonState::HELD)
+		{
+			angle = 2.0f;
+		}
+		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_Q) == nc::InputSystem::eButtonState::HELD)
+		{
+			angle = -2.0f;
+		}
+		model = glm::rotate(model, angle * engine.GetTimer().DeltaTime(), glm::vec3(0, 1, 0));
 
-		glm::mat4 mvp = projection * view * transform;
+		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_A) == nc::InputSystem::eButtonState::HELD)
+		{
+			eye.x -= 4 * engine.GetTimer().DeltaTime();
+		}
+		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_D) == nc::InputSystem::eButtonState::HELD)
+		{
+			eye.x += 4 * engine.GetTimer().DeltaTime();
+		}
+		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_W) == nc::InputSystem::eButtonState::HELD)
+		{
+			eye.z -= 4 * engine.GetTimer().DeltaTime();
+		}
+		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_S) == nc::InputSystem::eButtonState::HELD)
+		{
+			eye.z += 4 * engine.GetTimer().DeltaTime();
+		}
+
+		view = glm::lookAt(eye, eye + glm::vec3{ 0, 0, -1 }, glm::vec3{ 0, 1, 0 });
+
+		glm::mat4 mvp = projection * view * model;
 		program.SetUniform("transform", mvp);
 		
-		renderer.BeginFrame();
+		engine.GetSystem<nc::Renderer>()->BeginFrame();
 
 		// render triangle
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		GLsizei numElements = sizeof(indices) / sizeof(GLushort);
 		glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_SHORT, 0);
 
-		renderer.EndFrame();
+		engine.GetSystem<nc::Renderer>()->EndFrame();
 	}
+
+	engine.Shutdown();
 
 	return 0;
 }
