@@ -10,12 +10,50 @@ int main(int argc, char** argv)
 	renderer.Create("OpenGL", 800, 600);
 
 	// initialization
-	float vertices[] =
-	{
-		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // point1
-		 0.0f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.0f, // point2
-		 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f  // point3
+	//float vertices[] =
+	//{
+	//	-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, // point1
+	//	 0.0f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.0f, // point2
+	//	 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f  // point3
+	//};
+	static float vertices[] = {
+		// front
+		-1.0f, -1.0f,  1.0f, 0.0f, 0.0f,
+		 1.0f, -1.0f,  1.0f, 1.0f, 0.0f,
+		 1.0f,  1.0f,  1.0f, 1.0f, 1.0f,
+		-1.0f,  1.0f,  1.0f, 0.0f, 1.0f,
+		// back
+		-1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
+		 1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+		 1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
+		-1.0f,  1.0f, -1.0f, 1.0f, 1.0f,
 	};
+
+	// unsigned short - 16bits (0-16000)
+	// unsigned int - 32 bits (0, 400000000)
+
+	static GLushort indices[] =
+	{
+		// front
+		0, 1, 2,
+		2, 3, 0,
+		// right
+		1, 5, 6,
+		6, 2, 1,
+		// back
+		7, 6, 5,
+		5, 4, 7,
+		// left
+		4, 0, 3,
+		3, 7, 4,
+		// bottom
+		4, 5, 1,
+		1, 0, 4,
+		// top
+		3, 2, 6,
+		6, 7, 3
+	};
+
 
 	nc::Program program;
 	program.CreateShaderFromFile("shaders\\basic.vert", GL_VERTEX_SHADER);
@@ -30,22 +68,25 @@ int main(int argc, char** argv)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	// set position pipeline (vertex attribute)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
 
-	// set color pipeline (vertex attribute)
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	// set uv pipeline (vertex attribute)
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	// set uv pipeline (vertex attribute)
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
+	// create index buffers
+	GLuint ibo;
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// uniform
 	glm::mat4 transform = glm::mat4(1.0f);
-	//GLuint uniform = glGetUniformLocation(program.GetProgramID(), "transform");
-	//glUniformMatrix4fv(uniform, 1, GL_FALSE, glm::value_ptr(transform));
 	program.SetUniform("transform", transform);
+
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800 / 600.0f, 0.01f, 1000.0f);
+	glm::mat4 view = glm::lookAt(glm::vec3(0, 2, -5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 	nc::Texture texture;
 	texture.CreateTexture("textures\\llama.jpg");
@@ -70,15 +111,17 @@ int main(int argc, char** argv)
 
 		SDL_PumpEvents();
 
-		transform = glm::rotate(transform, 0.04f, glm::vec3(0, 0, 1));
-		program.SetUniform("transform", transform);
+		transform = glm::rotate(transform, 0.04f, glm::vec3(0, 1, 0));
 
-		//glUniformMatrix4fv(uniform, 1, GL_FALSE, glm::value_ptr(transform));
-
+		glm::mat4 mvp = projection * view * transform;
+		program.SetUniform("transform", mvp);
+		
 		renderer.BeginFrame();
 
 		// render triangle
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		//glDrawArrays(GL_TRIANGLES, 0, 3);
+		GLsizei numElements = sizeof(indices) / sizeof(GLushort);
+		glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_SHORT, 0);
 
 		renderer.EndFrame();
 	}
