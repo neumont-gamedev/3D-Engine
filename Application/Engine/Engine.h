@@ -11,6 +11,8 @@
 #include "Graphics/Renderer.h"
 #include "Graphics/Program.h"
 #include "Graphics/Texture.h"
+#include "Graphics/VertexArray.h"
+#include "Graphics/VertexIndexArray.h"
 
 #include "Resources/ResourceManager.h"
 #include "Input/InputSystem.h"
