@@ -6,6 +6,7 @@ int main(int argc, char** argv)
 	nc::Engine engine;
 	engine.Startup();
 
+	// initialization
 	static float vertices[] =
 	{
 		-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,
@@ -51,7 +52,7 @@ int main(int argc, char** argv)
 		-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f
 	};
 
-	//// initialization
+
 	//static float vertices[] = {
 	//	// front
 	//	-1.0f, -1.0f,  1.0f, 0.0f, 0.0f,
@@ -92,8 +93,8 @@ int main(int argc, char** argv)
 
 
 	nc::Program program;
-	program.CreateShaderFromFile("shaders\\basic.vert", GL_VERTEX_SHADER);
-	program.CreateShaderFromFile("shaders\\basic.frag", GL_FRAGMENT_SHADER);
+	program.CreateShaderFromFile("shaders\\gouraud.vert", GL_VERTEX_SHADER);
+	program.CreateShaderFromFile("shaders\\gouraud.frag", GL_FRAGMENT_SHADER);
 	program.Link();
 	program.Use();
 
@@ -107,9 +108,8 @@ int main(int argc, char** argv)
 	nc::VertexArray vertexArray;
 	vertexArray.Create("vertex");
 	vertexArray.CreateBuffer(sizeof(vertices), sizeof(vertices) / (sizeof(float) * 6), vertices);
-	vertexArray.SetAttribute(0, 3, 5 * sizeof(float), 0);
-	vertexArray.SetAttribute(1, 3, 5 * sizeof(float), 3 * sizeof(float));
-
+	vertexArray.SetAttribute(0, 3, 6 * sizeof(float), 0);
+	vertexArray.SetAttribute(1, 3, 6 * sizeof(float), 3 * sizeof(float));
 
 	// uniform
 	glm::mat4 model = glm::mat4(1.0f);
@@ -119,6 +119,13 @@ int main(int argc, char** argv)
 
 	nc::Texture texture;
 	texture.CreateTexture("textures\\llama.jpg");
+
+	program.SetUniform("material.ambient", glm::vec3{ 1, 1, 1 });
+	program.SetUniform("material.diffuse", glm::vec3{ 1, 1, 1 });
+
+	program.SetUniform("light.ambient", glm::vec3{ 0.1f, 0.1f, 0.1f });
+	program.SetUniform("light.diffuse", glm::vec3{ 0, 0, 1 });
+	glm::vec4 light{ 5, 5, 5, 1 };
 
 	bool quit = false;
 	while (!quit)
@@ -162,21 +169,27 @@ int main(int argc, char** argv)
 		}
 		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_W) == nc::InputSystem::eButtonState::HELD)
 		{
-			eye.z -= 4 * engine.GetTimer().DeltaTime();
+			eye.y -= 4 * engine.GetTimer().DeltaTime();
 		}
 		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_S) == nc::InputSystem::eButtonState::HELD)
 		{
-			eye.z += 4 * engine.GetTimer().DeltaTime();
+			eye.y += 4 * engine.GetTimer().DeltaTime();
 		}
 
 		view = glm::lookAt(eye, eye + glm::vec3{ 0, 0, -1 }, glm::vec3{ 0, 1, 0 });
 
 		glm::mat4 mvp = projection * view * model;
-		program.SetUniform("transform", mvp);
+		program.SetUniform("mvp", mvp);
+
+		glm::mat4 model_view = view * model;
+		program.SetUniform("model_view", model_view);
+
+		glm::vec4 position = view * light;
+		program.SetUniform("light.position", position);
 		
 		engine.GetSystem<nc::Renderer>()->BeginFrame();
 
-		vertexIndexArray.Draw();
+		vertexArray.Draw();
 
 		engine.GetSystem<nc::Renderer>()->EndFrame();
 	}

@@ -1,9 +1,9 @@
-#version 430
-	
-in vec3 fcolor;
-out vec4 color;
-	
+#version 430 core
+		
+in vec3 fs_color;
+out vec4 out_color;
+
 void main()
 {
-	color = vec4(fcolor, 1.0);
+	out_color = vec4(fs_color, 1.0);
 }
