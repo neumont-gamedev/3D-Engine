@@ -13,6 +13,7 @@
 #include "Graphics/Texture.h"
 #include "Graphics/VertexArray.h"
 #include "Graphics/VertexIndexArray.h"
+#include "Graphics/Model.h"
 
 #include "Resources/ResourceManager.h"
 #include "Input/InputSystem.h"

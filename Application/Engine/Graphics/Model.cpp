@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Model.h"
+#include <sstream>
 
 namespace nc
 {
@@ -21,45 +22,45 @@ namespace nc
 		{
 			if (line.substr(0, 2) == "v ")
 			{
-				std::istringstream stream{ line.substr(2) };
+				std::istringstream sstream{ line.substr(2) };
 				glm::vec3 position;
-				stream >> position.x;
-				stream >> position.y;
-				stream >> position.z;
+				sstream >> position.x;
+				sstream >> position.y;
+				sstream >> position.z;
 
 				model_positions.push_back(position);
 			}
 			else if (line.substr(0, 3) == "vn ")
 			{
-				std::istringstream stream{ line.substr(3) };
+				std::istringstream sstream{ line.substr(3) };
 				glm::vec3 normal;
-				stream >> normal.x;
-				stream >> normal.y;
-				stream >> normal.z;
+				sstream >> normal.x;
+				sstream >> normal.y;
+				sstream >> normal.z;
 
 				model_normals.push_back(normal);
 			}
 			else if (line.substr(0, 3) == "vt ")
 			{
-				std::istringstream stream{ line.substr(3) };
-				glm::vec3 texcoord;
-				stream >> texcoord.x;
-				stream >> texcoord.y;
+				std::istringstream sstream{ line.substr(3) };
+				glm::vec2 texcoord;
+				sstream >> texcoord.x;
+				sstream >> texcoord.y;
 
 				model_texcoords.push_back(texcoord);
 			}
 			else if (line.substr(0, 2) == "f ")
 			{
-				std::istringstream stream{ line.substr(2) };
+				std::istringstream sstream{ line.substr(2) };
 				std::string str;
-				while (std::getline(stream, str, ' '))
+				while (std::getline(sstream, str, ' '))
 				{
-					std::istringstream stream(str);
+					std::istringstream sstream(str);
 					std::string indexString;
 
 					size_t i = 0;
 					unsigned int index[3] = { 0, 0, 0 };
-					while (std::getline(stream, indexString, '/'))
+					while (std::getline(sstream, indexString, '/'))
 					{
 						if (!indexString.empty())
 						{
@@ -87,9 +88,7 @@ namespace nc
 						normals.push_back(normal);
 					}
 				}
-
 			}
-
 		}
 
 		stream.close();
