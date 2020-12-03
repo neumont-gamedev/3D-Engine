@@ -160,5 +160,7 @@
     <None Include="..\Build\Shaders\gouraud.vert">
       <Filter>Resources\Shaders</Filter>
     </None>
+    <None Include="..\Build\Shaders\phong.frag" />
+    <None Include="..\Build\Shaders\phong.vert" />
   </ItemGroup>
 </Project>

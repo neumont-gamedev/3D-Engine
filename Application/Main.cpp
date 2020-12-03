@@ -95,7 +95,7 @@ int main(int argc, char** argv)
 	glm::mat4 view = glm::lookAt(eye, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 	nc::Texture texture;
-	texture.CreateTexture("textures\\llama.jpg");
+	texture.CreateTexture("textures\\ogre_diffuse.bmp");
 
 	program.SetUniform("material.ambient", glm::vec3{ 1, 1, 1 });
 	program.SetUniform("material.diffuse", glm::vec3{ 1, 1, 1 });
@@ -103,7 +103,7 @@ int main(int argc, char** argv)
 	program.SetUniform("material.shininess", 32.0f);
 
 	program.SetUniform("light.ambient", glm::vec3{ 0.1f, 0.1f, 0.1f });
-	program.SetUniform("light.diffuse", glm::vec3{ 0, 0, 1 });
+	program.SetUniform("light.diffuse", glm::vec3{ 1, 1, 1 });
 	program.SetUniform("light.specular", glm::vec3{ 1, 1, 1 });
 
 	glm::vec4 light{ 5, 2, 5, 1 };
