@@ -7,52 +7,6 @@ int main(int argc, char** argv)
 	engine.Startup();
 
 	// initialization
-	static float vertices[] =
-	{
-		-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,
-		 1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,
-		 1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f,
-		-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f,
-
-		-1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-		 1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-		-1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-		-1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
-
-		-1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f,
-		-1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f,
-		-1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f,
-		-1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f,
-		-1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f,
-		-1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f,
-
-		 1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f,
-		 1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f,
-		 1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,
-		 1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,
-		 1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,
-		 1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f,
-
-		-1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,
-		 1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,
-		 1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,
-		 1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,
-		-1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f,
-		-1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f,
-
-		-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-		 1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f,
-		 1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-		 1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-		-1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,
-		-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f
-	};
-
-
 	nc::Program program;
 	program.CreateShaderFromFile("shaders\\phong.vert", GL_VERTEX_SHADER);
 	program.CreateShaderFromFile("shaders\\phong.frag", GL_FRAGMENT_SHADER);
@@ -62,9 +16,6 @@ int main(int argc, char** argv)
 
 	nc::VertexArray vertexArray;
 	vertexArray.Create("vertex");
-	//vertexArray.CreateBuffer(sizeof(vertices), sizeof(vertices) / (sizeof(float) * 6), vertices);
-	//vertexArray.SetAttribute(0, 3, 6 * sizeof(float), 0);
-	//vertexArray.SetAttribute(1, 3, 6 * sizeof(float), 3 * sizeof(float));
 
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec3> normals;
@@ -95,7 +46,7 @@ int main(int argc, char** argv)
 	glm::mat4 view = glm::lookAt(eye, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 	nc::Texture texture;
-	texture.CreateTexture("textures\\ogre_diffuse.bmp");
+	texture.CreateTexture("textures\\ogre_diffuse_flip.bmp");
 
 	program.SetUniform("material.ambient", glm::vec3{ 1, 1, 1 });
 	program.SetUniform("material.diffuse", glm::vec3{ 1, 1, 1 });
@@ -150,11 +101,11 @@ int main(int argc, char** argv)
 		}
 		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_W) == nc::InputSystem::eButtonState::HELD)
 		{
-			eye.y -= 4 * engine.GetTimer().DeltaTime();
+			eye.z -= 4 * engine.GetTimer().DeltaTime();
 		}
 		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_S) == nc::InputSystem::eButtonState::HELD)
 		{
-			eye.y += 4 * engine.GetTimer().DeltaTime();
+			eye.z += 4 * engine.GetTimer().DeltaTime();
 		}
 
 		view = glm::lookAt(eye, eye + glm::vec3{ 0, 0, -1 }, glm::vec3{ 0, 1, 0 });

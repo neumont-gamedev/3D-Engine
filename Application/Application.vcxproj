@@ -177,6 +177,7 @@
     <ClCompile Include="Engine\Graphics\VertexArray.cpp" />
     <ClCompile Include="Engine\Graphics\VertexIndexArray.cpp" />
     <ClCompile Include="Engine\Input\InputSystem.cpp" />
+    <ClCompile Include="Engine\Math\Transform.cpp" />
     <ClCompile Include="Engine\Resources\ResourceManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="pch.cpp">
@@ -203,6 +204,7 @@
     <ClInclude Include="Engine\Graphics\VertexIndexArray.h" />
     <ClInclude Include="Engine\Input\InputSystem.h" />
     <ClInclude Include="Engine\Math\Math.h" />
+    <ClInclude Include="Engine\Math\Transform.h" />
     <ClInclude Include="Engine\Resources\Resource.h" />
     <ClInclude Include="Engine\Resources\ResourceManager.h" />
     <ClInclude Include="pch.h" />
