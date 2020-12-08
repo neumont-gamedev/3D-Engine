@@ -1,5 +1,6 @@
 #pragma once
 #include "../Resources/Resource.h"
+#include <map>
 
 namespace nc
 {

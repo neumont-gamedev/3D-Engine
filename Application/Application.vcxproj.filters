@@ -37,6 +37,9 @@
     <Filter Include="Resources\Textures">
       <UniqueIdentifier>{24b73571-cfa3-49d7-8ea6-2e95f15d2939}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Engine\Objects">
+      <UniqueIdentifier>{45e74cf4-a9a7-4b79-933a-f4bb86bd959f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -85,10 +88,25 @@
       <Filter>Source\Engine\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Graphics\Model.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\Engine\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Math\Transform.cpp">
-      <Filter>Source</Filter>
+      <Filter>Source\Engine\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Graphics\Material.cpp">
+      <Filter>Source\Engine\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Objects\Light.cpp">
+      <Filter>Source\Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Objects\Object.cpp">
+      <Filter>Source\Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Objects\Scene.cpp">
+      <Filter>Source\Engine\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Objects\Camera.cpp">
+      <Filter>Source\Engine\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -146,11 +164,26 @@
     <ClInclude Include="Engine\Graphics\VertexIndexArray.h">
       <Filter>Source\Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Graphics\Model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Math\Transform.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Model.h">
+      <Filter>Source\Engine\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Graphics\Material.h">
+      <Filter>Source\Engine\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Objects\Camera.h">
+      <Filter>Source\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Objects\Light.h">
+      <Filter>Source\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Objects\Object.h">
+      <Filter>Source\Engine\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Objects\Scene.h">
+      <Filter>Source\Engine\Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -166,7 +199,11 @@
     <None Include="..\Build\Shaders\gouraud.vert">
       <Filter>Resources\Shaders</Filter>
     </None>
-    <None Include="..\Build\Shaders\phong.frag" />
-    <None Include="..\Build\Shaders\phong.vert" />
+    <None Include="..\Build\Shaders\phong.frag">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="..\Build\Shaders\phong.vert">
+      <Filter>Resources\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
