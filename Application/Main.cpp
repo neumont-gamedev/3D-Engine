@@ -10,8 +10,8 @@ int main(int argc, char** argv)
 
 	// initialization
 	nc::Program program;
-	program.CreateShaderFromFile("shaders\\phong.vert", GL_VERTEX_SHADER);
-	program.CreateShaderFromFile("shaders\\phong.frag", GL_FRAGMENT_SHADER);
+	program.CreateShaderFromFile("shaders/phong.vert", GL_VERTEX_SHADER);
+	program.CreateShaderFromFile("shaders/phong.frag", GL_FRAGMENT_SHADER);
 	program.Link();
 	program.Use();
 
@@ -52,17 +52,18 @@ int main(int argc, char** argv)
 	camera.SetLookAt(eye, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 	nc::Texture texture;
-	texture.CreateTexture("textures\\ogre_diffuse_flip.bmp");
+	texture.CreateTexture("textures/ogre_diffuse_flip.bmp");
 
 	nc::Material material{ glm::vec3{ 1 }, glm::vec3{ 1 }, glm::vec3{ 1 }, 32.0f };
 	material.AddTexture(texture);
 	material.SetProgram(program);
 
-	program.SetUniform("light.ambient", glm::vec3{ 0.1f, 0.1f, 0.1f });
-	program.SetUniform("light.diffuse", glm::vec3{ 1, 1, 1 });
-	program.SetUniform("light.specular", glm::vec3{ 1, 1, 1 });
-
-	glm::vec4 light{ 5, 2, 5, 1 };
+	nc::Light light{ "light", 
+		nc::Transform{ glm::vec3{5, 2, 5} }, 
+		glm::vec3{ 0.1f }, 
+		glm::vec3{ 1 }, 
+		glm::vec3{ 1 } };
+	scene.Add(&light);
 
 	bool quit = false;
 	while (!quit)
@@ -97,33 +98,18 @@ int main(int argc, char** argv)
 			angle = -2.0f;
 		}
 		model = glm::rotate(model, angle * engine.GetTimer().DeltaTime(), glm::vec3(0, 1, 0));
-
-		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_A) == nc::InputSystem::eButtonState::HELD)
-		{
-			camera.transform().translation.x -= 4 * engine.GetTimer().DeltaTime();
-		}
-		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_D) == nc::InputSystem::eButtonState::HELD)
-		{
-			camera.transform().translation.x += 4 * engine.GetTimer().DeltaTime();
-		}
-		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_W) == nc::InputSystem::eButtonState::HELD)
-		{
-			camera.transform().translation.z -= 4 * engine.GetTimer().DeltaTime();
-		}
-		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_S) == nc::InputSystem::eButtonState::HELD)
-		{
-			camera.transform().translation.z += 4 * engine.GetTimer().DeltaTime();
-		}
-
-
+		
 		glm::mat4 mvp = camera.projection() * camera.view() * model;
 		program.SetUniform("mvp", mvp);
 
 		glm::mat4 model_view = camera.view() * model;
 		program.SetUniform("model_view", model_view);
 
-		glm::vec4 position = camera.view() * light;
-		program.SetUniform("light.position", position);
+		std::vector<nc::Light*> lights = scene.Get<nc::Light>();
+		for (auto light : lights)
+		{
+			light->SetProgram(program);
+		}
 		
 		engine.GetSystem<nc::Renderer>()->BeginFrame();
 

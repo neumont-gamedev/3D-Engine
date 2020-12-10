@@ -14,7 +14,7 @@ namespace nc
 			specular{ specular }
 		{}
 
-		void SetProgram(Program& program) {}
+		void SetProgram(Program& program);
 
 	public:
 		glm::vec3 ambient = glm::vec3(0);

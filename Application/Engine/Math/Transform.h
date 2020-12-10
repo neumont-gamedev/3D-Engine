@@ -23,5 +23,14 @@ namespace nc
 
 			return (translationMatrix * rotationMatrix * scaleMatrix);
 		}
+
+		Transform& operator = (const glm::mat4& matrix)
+		{
+			translation = glm::vec3{ matrix[3] };
+			scale = glm::vec3{ matrix[0][0], matrix[1][1], matrix[2][2] };
+			glm::extractEulerAngleYXZ(matrix, rotation.y, rotation.x, rotation.z);
+
+			return *this;
+		}
 	};
 }

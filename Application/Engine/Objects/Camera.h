@@ -10,10 +10,7 @@ namespace nc
 
 		void Update(float dt) override;
 
-		void SetLookAt(const glm::vec3& eye, const glm::vec3& target, const glm::vec3& up = glm::vec3{ 0, 1, 0 }, bool initialize = false)
-		{
-			m_view = glm::lookAt(eye, target, up);
-		}
+		void SetLookAt(const glm::vec3& eye, const glm::vec3& target, const glm::vec3& up = glm::vec3{ 0, 1, 0 }, bool initialize = false);
 		void SetProjection(float fov, float aspectRatio, float nearClip, float farClip)
 		{
 			m_projection = glm::perspective(glm::radians(fov), aspectRatio, nearClip, farClip);
