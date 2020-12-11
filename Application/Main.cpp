@@ -15,40 +15,23 @@ int main(int argc, char** argv)
 	program.Link();
 	program.Use();
 
+	nc::VertexArray vertexArray = nc::Model::Load("models/sphere.obj");
 
-	nc::VertexArray vertexArray;
-	vertexArray.Create("vertex");
+	nc::Texture texture;
+	texture.CreateTexture("textures/lava.png");
 
-	std::vector<glm::vec3> positions;
-	std::vector<glm::vec3> normals;
-	std::vector<glm::vec2> texcoords;
-	nc::Model::Load("models/ogre.obj", positions, normals, texcoords);
+	nc::Material material{ glm::vec3{ 1 }, glm::vec3{ 1 }, glm::vec3{ 1 }, 32.0f };
+	material.AddTexture(texture);
+	material.SetProgram(program);
 
-	if (!positions.empty())
-	{
-		vertexArray.CreateBuffer(positions.size() * sizeof(glm::vec3), positions.size(), positions.data());
-		vertexArray.SetAttribute(0, 3, 0, 0);
-	}
-	if (!normals.empty())
-	{
-		vertexArray.CreateBuffer(normals.size() * sizeof(glm::vec3), normals.size(), normals.data());
-		vertexArray.SetAttribute(1, 3, 0, 0);
-	}
-	if (!texcoords.empty())
-	{
-		vertexArray.CreateBuffer(texcoords.size() * sizeof(glm::vec2), texcoords.size(), texcoords.data());
-		vertexArray.SetAttribute(2, 2, 0, 0);
-	}
-
-	// uniform
-	glm::mat4 model = glm::mat4(1.0f);
+	nc::Model model{ "model", nc::Transform{ {0, 0, 0}, {glm::half_pi<float>(), 0, 0} }, vertexArray, program, material };
+	scene.Add(&model);
 
 	// camera
-	glm::vec3 eye{0, 0, 5};
-
 	nc::Camera camera{ "camera" };
 	scene.Add(&camera);
 	camera.SetProjection(45.0f, 800.0f / 600.0f, 0.01f, 1000.0f);
+	glm::vec3 eye{0, 0, 5};
 	camera.SetLookAt(eye, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 	nc::Texture texture;
@@ -97,23 +80,32 @@ int main(int argc, char** argv)
 		{
 			angle = -2.0f;
 		}
-		model = glm::rotate(model, angle * engine.GetTimer().DeltaTime(), glm::vec3(0, 1, 0));
+		model.transform().rotation.y += angle * engine.GetTimer().DeltaTime();
+
+		// update program lights
+		std::vector<nc::Light*> lights = scene.Get<nc::Light>();
+		for (nc::Light* light : lights)
+		{
+			light->SetProgram(program);
+		}
 		
+		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_S) == nc::InputSystem::eButtonState::HELD)
+		{
+			camera.transform().translation.z += 4 * engine.GetTimer().DeltaTime();
+		}
+
+
 		glm::mat4 mvp = camera.projection() * camera.view() * model;
 		program.SetUniform("mvp", mvp);
 
 		glm::mat4 model_view = camera.view() * model;
 		program.SetUniform("model_view", model_view);
 
-		std::vector<nc::Light*> lights = scene.Get<nc::Light>();
-		for (auto light : lights)
-		{
-			light->SetProgram(program);
-		}
+		glm::vec4 position = camera.view() * light;
+		program.SetUniform("light.position", position);
 		
 		engine.GetSystem<nc::Renderer>()->BeginFrame();
-
-		vertexArray.Draw();
+				
 		scene.Draw();
 
 		engine.GetSystem<nc::Renderer>()->EndFrame();
