@@ -14,8 +14,6 @@ namespace nc
 		
 		void Draw() override;
 
-		//Program& program() { return m_program; }
-
 	public:
 		static bool Load(const std::string& filename, 
 						std::vector<glm::vec3>& positions, 

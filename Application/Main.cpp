@@ -15,16 +15,16 @@ int main(int argc, char** argv)
 	program.Link();
 	program.Use();
 
-	nc::VertexArray vertexArray = nc::Model::Load("models/sphere.obj");
+	nc::VertexArray vertexArray = nc::Model::Load("models/cube.obj");
 
 	nc::Texture texture;
-	texture.CreateTexture("textures/lava.png");
+	texture.CreateTexture("textures/rock.png");
 
 	nc::Material material{ glm::vec3{ 1 }, glm::vec3{ 1 }, glm::vec3{ 1 }, 32.0f };
 	material.AddTexture(texture);
 	material.SetProgram(program);
 
-	nc::Model model{ "model", nc::Transform{ {0, 0, 0}, {glm::half_pi<float>(), 0, 0} }, vertexArray, program, material };
+	nc::Model model{ "model", nc::Transform{ {0, 0, 0} }, vertexArray, program, material };
 	scene.Add(&model);
 
 	// camera
@@ -33,13 +33,6 @@ int main(int argc, char** argv)
 	camera.SetProjection(45.0f, 800.0f / 600.0f, 0.01f, 1000.0f);
 	glm::vec3 eye{0, 0, 5};
 	camera.SetLookAt(eye, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-
-	nc::Texture texture;
-	texture.CreateTexture("textures/ogre_diffuse_flip.bmp");
-
-	nc::Material material{ glm::vec3{ 1 }, glm::vec3{ 1 }, glm::vec3{ 1 }, 32.0f };
-	material.AddTexture(texture);
-	material.SetProgram(program);
 
 	nc::Light light{ "light", 
 		nc::Transform{ glm::vec3{5, 2, 5} }, 
@@ -67,20 +60,20 @@ int main(int argc, char** argv)
 		}
 
 		SDL_PumpEvents();
-		engine.Update();
 
+		engine.Update();
 		scene.Update(engine.GetTimer().DeltaTime());
 
-		float angle = 0;
-		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_E) == nc::InputSystem::eButtonState::HELD)
-		{
-			angle = 2.0f;
-		}
-		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_Q) == nc::InputSystem::eButtonState::HELD)
-		{
-			angle = -2.0f;
-		}
-		model.transform().rotation.y += angle * engine.GetTimer().DeltaTime();
+		//float angle = 0;
+		//if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_E) == nc::InputSystem::eButtonState::HELD)
+		//{
+		//	angle = 2.0f;
+		//}
+		//if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_Q) == nc::InputSystem::eButtonState::HELD)
+		//{
+		//	angle = -2.0f;
+		//}
+		//model.transform().rotation.y += angle * engine.GetTimer().DeltaTime();
 
 		// update program lights
 		std::vector<nc::Light*> lights = scene.Get<nc::Light>();
@@ -88,21 +81,6 @@ int main(int argc, char** argv)
 		{
 			light->SetProgram(program);
 		}
-		
-		if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_S) == nc::InputSystem::eButtonState::HELD)
-		{
-			camera.transform().translation.z += 4 * engine.GetTimer().DeltaTime();
-		}
-
-
-		glm::mat4 mvp = camera.projection() * camera.view() * model;
-		program.SetUniform("mvp", mvp);
-
-		glm::mat4 model_view = camera.view() * model;
-		program.SetUniform("model_view", model_view);
-
-		glm::vec4 position = camera.view() * light;
-		program.SetUniform("light.position", position);
 		
 		engine.GetSystem<nc::Renderer>()->BeginFrame();
 				
