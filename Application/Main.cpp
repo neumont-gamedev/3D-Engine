@@ -15,17 +15,41 @@ int main(int argc, char** argv)
 	program.Link();
 	program.Use();
 
-	nc::VertexArray vertexArray = nc::Model::Load("models/cube.obj");
+	nc::VertexArray cubeVertexArray = nc::Model::Load("models/sphere.obj");
+	nc::VertexArray planeVertexArray = nc::Model::Load("models/plane.obj");
 
+	// wood material
 	nc::Texture texture;
-	texture.CreateTexture("textures/rock.png");
+	texture.CreateTexture("textures/lava.png");
 
-	nc::Material material{ glm::vec3{ 1 }, glm::vec3{ 1 }, glm::vec3{ 1 }, 32.0f };
-	material.AddTexture(texture);
-	material.SetProgram(program);
+	nc::Material woodMaterial{ glm::vec3{ 1 }, glm::vec3{ 1 }, glm::vec3{ 1 }, 32.0f };
+	woodMaterial.AddTexture(texture);
+	woodMaterial.SetProgram(program);
 
-	nc::Model model{ "model", nc::Transform{ {0, 0, 0} }, vertexArray, program, material };
-	scene.Add(&model);
+	// grass material
+	texture.CreateTexture("textures/grass.jpg");
+
+	nc::Material grassMaterial{ glm::vec3{ 1 }, glm::vec3{ 1 }, glm::vec3{ 0.2f }, 32.0f };
+	grassMaterial.AddTexture(texture);
+	grassMaterial.SetProgram(program);
+
+	// create models
+	nc::Model* model;
+
+	model = new nc::Model{ "floor", nc::Transform{ {0, -2, 0}, glm::vec3{0}, glm::vec3{400} }, planeVertexArray, program, grassMaterial };
+	scene.Add(model);
+
+	float range = 10;
+	for (int i = 0; i < 100; i++)
+	{
+		float x = nc::random(-range, range);
+		float y = nc::random(0, range);
+		float z = nc::random(-range, range);
+
+		model = new nc::Model{ "cube", nc::Transform{ {x, y, z} }, cubeVertexArray, program, woodMaterial };
+		scene.Add(model);
+	}
+
 
 	// camera
 	nc::Camera camera{ "camera" };
@@ -35,7 +59,7 @@ int main(int argc, char** argv)
 	camera.SetLookAt(eye, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 	nc::Light light{ "light", 
-		nc::Transform{ glm::vec3{5, 2, 5} }, 
+		nc::Transform{ glm::vec3{0, 40, 0} }, 
 		glm::vec3{ 0.1f }, 
 		glm::vec3{ 1 }, 
 		glm::vec3{ 1 } };
@@ -62,18 +86,27 @@ int main(int argc, char** argv)
 		SDL_PumpEvents();
 
 		engine.Update();
-		scene.Update(engine.GetTimer().DeltaTime());
+		float dt = engine.GetTimer().DeltaTime();
+		scene.Update(dt);
 
-		//float angle = 0;
-		//if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_E) == nc::InputSystem::eButtonState::HELD)
-		//{
-		//	angle = 2.0f;
-		//}
-		//if (engine.GetSystem<nc::InputSystem>()->GetButtonState(SDL_SCANCODE_Q) == nc::InputSystem::eButtonState::HELD)
-		//{
-		//	angle = -2.0f;
-		//}
-		//model.transform().rotation.y += angle * engine.GetTimer().DeltaTime();
+		std::vector<nc::Model*> models = scene.Get<nc::Model>();
+		for (auto model : models)
+		{
+			if (model->name() != "floor")
+			{
+				model->transform().rotation.y += 2 * dt;
+			}
+		}
+
+		if (engine.GetSystem<nc::InputSystem>()->GetMouseButtonState(SDL_BUTTON_LEFT) == nc::InputSystem::eButtonState::PRESSED)
+		{
+			nc::Camera* camera = scene.Get<nc::Camera>("camera");
+
+			glm::vec3 offset = glm::quat(camera->transform().rotation) * glm::vec3{0, 0, -2};
+
+			model = new nc::Model{ "cube", nc::Transform{ camera->transform().translation + offset }, cubeVertexArray, program, woodMaterial };
+			scene.Add(model);
+		}
 
 		// update program lights
 		std::vector<nc::Light*> lights = scene.Get<nc::Light>();

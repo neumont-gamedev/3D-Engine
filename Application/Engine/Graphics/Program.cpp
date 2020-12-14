@@ -198,7 +198,12 @@ namespace nc
 		if (uniform == m_uniforms.end())
 		{
 			// add uniform to map
-			m_uniforms[name] = glGetUniformLocation(m_program, name.c_str());
+			GLuint uniform = glGetUniformLocation(m_program, name.c_str());
+			if (uniform == -1)
+			{
+				SDL_Log("Could not find uniform: %s", name.c_str());
+			}
+			m_uniforms[name] = uniform;
 		}
 
 		return m_uniforms[name];

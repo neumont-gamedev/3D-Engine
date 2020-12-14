@@ -8,6 +8,7 @@ namespace nc
 	{
 		m_program.Use();
 		m_material.SetProgram(m_program);
+		m_material.Bind();
 
 		Camera* camera = m_scene->Get<Camera>("camera");
 		ASSERT(camera != nullptr);
